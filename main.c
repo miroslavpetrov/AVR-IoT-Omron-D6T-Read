@@ -37,19 +37,19 @@
 #define threshHoldDec 10
 
 // Initializing variables for occupancy algorithm.
-uint16_t pix_data = 0;
+uint16_t lastReading = 0;
 int16_t seqData[40] = {0};
 bool occuPix = 0;
 bool occuPixFlag = false;
 uint8_t resultOccupancy = 0;
 uint16_t totalCount = 0;
 
-bool judge_seatOccupancy(void) { 
+bool judge_Occupancy(void) { 
   int j = 0; 
   for (j = 0; j < 39; j++){
     seqData[39 - j] = seqData[38 - j];
   }
-  seqData[0] = pix_data;            
+  seqData[0] = lastReading;            
   if (totalCount <= comparingNumInc){
     totalCount++;
   }
@@ -92,9 +92,8 @@ int main(void)
    
     SYSTEM_Initialize();
     uint16_t sensorValue = 0;
+     
     
-    
-    /* Replace with your application code */
     while (1){
         
         _delay_ms(1000);
@@ -108,9 +107,9 @@ int main(void)
         //Convert the raw hex values to integer according to the sensor's documentation.     
         sensorValue = 256*buf[3] + buf[2] ;
         //Assign pix_data variable the value of the acquired temperature reading. This is needed for the occupancy algorithm.
-        pix_data = sensorValue;
+        lastReading = sensorValue;
         //Call the judge occupancy function which will return the occupancy state.
-        judge_seatOccupancy();
+        judge_Occupancy();
         //Print to UART the reading of the sensor in Degrees Celsius.
         printf("\nTemp: %d.%02d", (sensorValue/10), abs(sensorValue)%100);
         //Print the occupancy state.
